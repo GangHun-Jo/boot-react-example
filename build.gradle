@@ -1,0 +1,74 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
+    id 'war'
+    id "com.github.node-gradle.node" version "2.2.4"
+}
+
+group = 'com.navercorp.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    maven {
+        url "http://repo.navercorp.com/maven2"
+    }
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+    implementation 'commons-io:commons-io:2.6'
+
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+processResources {
+    from ('fe/assets/') {
+        into 'assets'
+    }
+}
+ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
+
+if (profile != 'local') {
+    node {
+        version "10.22.0"
+        distBaseUrl = 'https://nodejs.org/dist'
+        download true
+        workDir file("$projectDir/fe/nodejs")
+        npmWorkDir file("$projectDir/fe/npm")
+        nodeModulesDir file("$projectDir/fe/node_modules")
+    }
+}
+
+apply plugin: 'com.github.node-gradle.node'
+
+task webNpmInstall(type: NpmTask) {
+    workingDir = file("./fe")
+    args = ['install']
+}
+
+// webpack build
+task webpackBuild(type: NpmTask) {
+    workingDir = file("${project.projectDir}/fe")
+    args = ["run", 'prod']
+}
+
+webpackBuild.dependsOn webNpmInstall
+processResources.dependsOn webpackBuild
+compileJava.dependsOn processResources
