@@ -89,9 +89,6 @@ module.exports = {
         }),
 		new CleanWebpackPlugin(),
 		new CopyPlugin({
-			patterns : [
-				{ from: './markup/src/img/', to: './img/' },
-			]
 		})
     ],
     devServer: {

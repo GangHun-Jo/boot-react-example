@@ -1,15 +1,19 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+// 리소스를 복사해서 옮겨준다.
 const CopyPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+// webpack minimize plugin
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
+	// production mode는 운영환경에 필요한 플러그인과 minimize가 추가된다.
 	mode: 'production',
 	entry: './src/index.tsx',
 	output: {
 		path: path.resolve('assets'),
 		filename: 'static/js/bundle.[hash].js',
+		// public path :  base path for all the assets within your application.
 		publicPath: '/'
 	},
 	module: {
@@ -91,7 +95,6 @@ module.exports = {
 		new CleanWebpackPlugin(),
 		new CopyPlugin({
 			patterns : [
-				{ from: './markup/src/img/', to: './img/' },
 			]
 		})
 	],
@@ -101,6 +104,7 @@ module.exports = {
 			new TerserPlugin({
 				extractComments: false,
 				terserOptions: {
+					// ecma5로 설정해주어야 ie에서도 동작
 					ecma: 5,
 					compress: {
 						drop_console: true

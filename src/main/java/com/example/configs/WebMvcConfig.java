@@ -1,4 +1,4 @@
-package com.navercorp.example.configs;
+package com.example.configs;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
