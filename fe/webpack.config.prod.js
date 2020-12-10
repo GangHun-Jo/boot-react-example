@@ -1,8 +1,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-	mode: 'development',
+	mode: 'production',
 	entry: './src/index.tsx',
 	output: {
 		path: path.resolve('assets'),
@@ -84,6 +87,26 @@ module.exports = {
 	plugins: [
 		new HtmlWebpackPlugin({
 			template: 'public/index.html',
+		}),
+		new CleanWebpackPlugin(),
+		new CopyPlugin({
+			patterns : [
+				{ from: './markup/src/img/', to: './img/' },
+			]
 		})
-	]
+	],
+	optimization: {
+		minimize: true,
+		minimizer: [
+			new TerserPlugin({
+				extractComments: false,
+				terserOptions: {
+					ecma: 5,
+					compress: {
+						drop_console: true
+					}
+				}
+			})
+		],
+	},
 };
